@@ -152,6 +152,7 @@ body::after {
     line-height: 1.3;
     z-index: 10;
     position: relative;
+    margin-bottom: 1.5rem;
 }
 
 .container-envelope > .envelope-wrapper {
@@ -159,7 +160,10 @@ body::after {
     box-shadow: 0 25px 60px rgba(120, 100, 80, 0.4);
     border: 1px solid rgba(201, 166, 144, 0.35);
     border-radius: 15px;
-    transform: rotate(-5deg);
+    --envelope-tilt: -5deg;
+    --envelope-scale: 1;
+    transform: translateY(0) rotate(var(--envelope-tilt)) scale(var(--envelope-scale));
+    transform-origin: center;
     transition: transform 0.3s ease-in-out;
 }
 
@@ -191,6 +195,27 @@ body::after {
     border-right: 175px solid #e5d5c5;
     border-bottom: 110px solid #e5d5c5;
     border-left: 175px solid #e5d5c5;
+}
+
+@media (max-width: 640px) {
+    .container-envelope {
+        gap: 13rem;
+    }
+
+    .invitation-text-top {
+        font-size: 42px;
+        margin-bottom: 2.5rem;
+    }
+
+    .container-envelope > .envelope-wrapper {
+        --envelope-scale: 0.85;
+    }
+}
+
+@media (max-width: 420px) {
+    .container-envelope > .envelope-wrapper {
+        --envelope-scale: 0.72;
+    }
 }
 
 .envelope > .letter {
@@ -308,13 +333,13 @@ body::after {
 /* Анимация встряхивания конверта */
 @keyframes envelopeShake {
     0%, 100% {
-        transform: translateY(0) rotate(0deg);
+        transform: translateY(0) rotate(var(--envelope-tilt)) scale(var(--envelope-scale));
     }
-    10%, 30%, 50%, 70%, 90% {
-        transform: translateY(-5px) rotate(-1deg);
+    15%, 45%, 75% {
+        transform: translateY(-4px) rotate(var(--envelope-tilt)) rotate(-0.8deg) scale(var(--envelope-scale));
     }
-    20%, 40%, 60%, 80% {
-        transform: translateY(-5px) rotate(1deg);
+    30%, 60%, 90% {
+        transform: translateY(-4px) rotate(var(--envelope-tilt)) rotate(0.8deg) scale(var(--envelope-scale));
     }
 }
 
@@ -937,6 +962,7 @@ body::after {
     border: 1px solid rgba(230, 220, 210, 0.7);
     background: linear-gradient(180deg, rgba(250, 248, 245, 0.75), rgba(245, 240, 235, 0.7));
     box-shadow: 0 25px 60px rgba(120, 100, 80, 0.18);
+    text-align: left;
 }
 
 .form-card {
@@ -1005,6 +1031,8 @@ fieldset {
     flex-direction: column;
     gap: 0.9rem;
     margin: 0;
+    text-align: left;
+    align-items: flex-start;
 }
 
 fieldset legend {
@@ -1014,6 +1042,7 @@ fieldset legend {
 .radio {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 0.5rem;
     font-family: 'Inter', sans-serif;
     font-size: 0.95rem;
@@ -1021,6 +1050,7 @@ fieldset legend {
     padding: 0;
     cursor: pointer;
     color: var(--ink);
+    width: 100%;
 }
 
 .radio input {
