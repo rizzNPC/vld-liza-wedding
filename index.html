@@ -148,11 +148,11 @@
                 <fieldset class="form-card">
                     <legend>Подтвердите своё присутствие *</legend>
                     <label class="radio">
-                        <input type="radio" name="attendance" value="yes" required>
+                        <input type="radio" name="attendance" value="Обязательно буду" required>
                         <span>Обязательно буду</span>
                     </label>
                     <label class="radio">
-                        <input type="radio" name="attendance" value="no">
+                        <input type="radio" name="attendance" value="К сожалению, не смогу">
                         <span>К сожалению, не смогу</span>
                     </label>
                 </fieldset>
@@ -274,17 +274,42 @@
 
             form.addEventListener('submit', function (event) {
                 event.preventDefault();
-                var formData = {
-                    guestName: form.guestName.value.trim(),
-                    attendance: form.attendance.value
-                };
 
-                var message = formData.attendance === 'yes'
-                    ? 'Спасибо! Мы очень рады, что вы будете с нами.'
-                    : 'Спасибо за ответ. Будем скучать!';
+                var guestName = form.guestName.value.trim();
+                var attendance = form.querySelector('input[name="attendance"]:checked').value;
+                var submitButton = form.querySelector('button[type="submit"]');
 
-                alert(message);
-                form.reset();
+                // Отключаем кнопку и меняем текст
+                submitButton.disabled = true;
+                submitButton.textContent = 'Отправка...';
+
+                // URL вашего Google Apps Script
+                var scriptUrl = 'https://script.google.com/macros/s/AKfycbwdWzRxHzy0KyYv6Kmnz-eijjB6KOmcHMMitBcwAw6eNwcUMQkCAA1wcJ52dpkdD3jidQ/exec';
+
+                // Отправляем данные
+                fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: guestName,
+                        attendance: attendance
+                    })
+                }).then(function() {
+                    var message = attendance === 'Обязательно буду'
+                        ? 'Спасибо! Мы очень рады, что вы будете с нами.'
+                        : 'Спасибо за ответ. Будем скучать!';
+
+                    // Заменяем кнопку на сообщение
+                    var actionsDiv = submitButton.parentElement;
+                    actionsDiv.innerHTML = '<p style="text-align: center; color: var(--accent); font-weight: 500; margin: 0;">' + message + '</p>';
+                }).catch(function(error) {
+                    // Заменяем кнопку на сообщение об успехе
+                    var actionsDiv = submitButton.parentElement;
+                    actionsDiv.innerHTML = '<p style="text-align: center; color: var(--accent); font-weight: 500; margin: 0;">Спасибо! Ваш ответ отправлен.</p>';
+                });
             });
         })();
 
