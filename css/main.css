@@ -138,7 +138,7 @@ body::after {
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    gap: 12rem;
+    gap: 10rem;
 }
 
 .invitation-text-top {
@@ -165,6 +165,7 @@ body::after {
     transform: translateY(0) rotate(var(--envelope-tilt)) scale(var(--envelope-scale));
     transform-origin: center;
     transition: transform 0.3s ease-in-out;
+    cursor: pointer;
 }
 
 .envelope-wrapper > .envelope {
@@ -199,7 +200,7 @@ body::after {
 
 @media (max-width: 640px) {
     .container-envelope {
-        gap: 13rem;
+        gap: 8rem;
     }
 
     .invitation-text-top {
@@ -215,6 +216,62 @@ body::after {
 @media (max-width: 420px) {
     .container-envelope > .envelope-wrapper {
         --envelope-scale: 0.72;
+    }
+
+    .container-envelope {
+        gap: 6rem;
+    }
+
+    .envelope-hint {
+        margin-top: -0.8rem;
+        font-size: 0.78rem;
+        padding: 0.6rem 1.2rem;
+    }
+}
+
+.envelope-wrapper:focus-visible {
+    outline: 2px solid rgba(201, 166, 144, 0.9);
+    outline-offset: 12px;
+}
+
+.envelope-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: -0.3rem 0 0;
+    padding: 0.65rem 1.5rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(201, 166, 144, 0.5);
+    box-shadow: 0 15px 40px rgba(120, 100, 80, 0.18);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    color: var(--ink);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    animation: envelopeHintPulse 2.6s ease-in-out infinite;
+}
+
+.envelope-hint__icon {
+    font-size: 1.4rem;
+    color: var(--accent);
+}
+
+.envelope-wrapper.flap + .envelope-hint {
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+}
+
+@keyframes envelopeHintPulse {
+    0%, 100% {
+        transform: translateY(0);
+        box-shadow: 0 15px 40px rgba(120, 100, 80, 0.18);
+    }
+    50% {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 50px rgba(120, 100, 80, 0.25);
     }
 }
 
@@ -696,7 +753,7 @@ body::after {
     text-decoration: none;
     color: var(--ink);
     font-weight: 600;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     font-size: 0.75rem;
     box-shadow: 0 10px 25px rgba(120, 100, 80, 0.25);
@@ -714,6 +771,17 @@ body::after {
     color: var(--muted);
 }
 
+#location .button-row .btn {
+    flex: 1 1 220px;
+    max-width: 260px;
+}
+
+#location .button-row .btn.btn--ghost {
+    border-color: transparent;
+    background: linear-gradient(120deg, #f5f0ea, #edddd0, #e8d5c4);
+    color: var(--ink);
+}
+
 .btn--florist {
     display: inline-flex;
     align-items: center;
@@ -722,6 +790,29 @@ body::after {
     padding: 0.95rem 1.8rem;
     width: auto;
     flex: none;
+}
+
+.florist-form-wrapper {
+    display: none;
+    margin: 0.3rem auto 1.2rem;
+    max-width: 520px;
+    width: 100%;
+}
+
+.florist-form-wrapper--visible {
+    display: block;
+}
+
+.florist-form__description {
+    text-align: center;
+    font-weight: 500;
+    color: var(--muted);
+    margin: 0 0 1rem;
+    line-height: 1.5;
+}
+
+.florist-form .form-card {
+    margin-bottom: 1rem;
 }
 
 .btn--contact {
@@ -1001,7 +1092,8 @@ body::after {
     gap: 0.4rem;
 }
 
-.rsvp-form input[type="text"] {
+.rsvp-form input[type="text"],
+.rsvp-form input[type="tel"] {
     width: 100%;
     padding: 0.95rem 1.1rem;
     border-radius: 22px;
@@ -1014,13 +1106,15 @@ body::after {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-.rsvp-form input[type="text"]:focus {
+.rsvp-form input[type="text"]:focus,
+.rsvp-form input[type="tel"]:focus {
     border-color: rgba(201, 166, 144, 0.9);
     background: #faf8f6;
     box-shadow: 0 0 0 2px rgba(201, 166, 144, 0.3);
 }
 
-.rsvp-form input[type="text"]::placeholder {
+.rsvp-form input[type="text"]::placeholder,
+.rsvp-form input[type="tel"]::placeholder {
     color: rgba(43, 39, 36, 0.4);
 }
 

@@ -24,7 +24,7 @@
         <section class="slide slide--active" id="slide-1">
             <div class="container-envelope">
                 <div class="invitation-text-top">Приглашаем Вас, Иван</div>
-                <div class="envelope-wrapper">
+                <div class="envelope-wrapper" role="button" tabindex="0" aria-label="Открыть приглашение" aria-pressed="false">
                     <div class="envelope">
                         <div class="letter">
                             <div class="letter-content">
@@ -36,6 +36,10 @@
                     </div>
                     <div class="heart"></div>
                 </div>
+                <p class="envelope-hint" aria-hidden="true">
+                    <span class="material-symbols-outlined envelope-hint__icon">touch_app</span>
+                    <span>Нажмите на конверт, чтобы открыть</span>
+                </p>
             </div>
             <button class="slide__arrow" id="scroll-to-content" aria-label="Перейти к основному содержимому">
                 <span class="material-symbols-outlined">keyboard_arrow_down</span>
@@ -119,10 +123,26 @@
         <section class="sheet" id="details">
             <h2>Немного важных слов</h2>
             <p>Мы знаем, что на свадьбах принято дарить цветы, но мы не успеем насладиться их красотой, ведь они так быстро завянут! Вместо букета мы будем рады, если Вы оформите цветочную подписку. Каждую неделю будем получать новый букет от вас, чтобы продлить наш праздник.</p>
-            <a class="btn btn--florist" href="https://wa.me/НОМЕР_ФЛОРИСТА?text=Здравствуйте!%20Хочу%20оформить%20цветочную%20подписку%20для%20Владислава%20и%20Елизаветы" target="_blank" rel="noopener noreferrer">
+            <button class="btn btn--florist" type="button" id="toggle-florist-form" aria-expanded="false" aria-controls="florist-form-wrapper">
                 <span class="material-symbols-outlined btn-icon">local_florist</span>
                 Заказать цветочную подписку
-            </a>
+            </button>
+            <div class="florist-form-wrapper" id="florist-form-wrapper" aria-hidden="true">
+                <p class="florist-form__description">Если хотите оформить цветочную подписку, заполните данные ниже и флористы свяжутся с Вами 🫶</p>
+                <form id="florist-form" class="rsvp-form florist-form">
+                    <label class="form-card">
+                        <span>Ваше имя *</span>
+                        <input type="text" name="floristName" placeholder="Введите имя" required>
+                    </label>
+                    <label class="form-card">
+                        <span>Номер телефона *</span>
+                        <input type="tel" name="floristPhone" placeholder="+7 (___) ___-__-__" inputmode="tel" autocomplete="tel" maxlength="18" required>
+                    </label>
+                    <div class="form-card form-card--actions">
+                        <button type="submit" class="btn">Отправить заявку</button>
+                    </div>
+                </form>
+            </div>
             <p>Ваши улыбки и смех подарят нам незабываемое счастье в этот день, а пожелания в конвертах помогут осуществить наши мечты!</p>
             <p>Мы с теплотой относимся к Вашим деткам, но приняли решение сделать нашу свадьбу праздником только для взрослых. Пожалуйста, оставьте детей в надежных руках. Спасибо за понимание!</p>
         </section>
@@ -143,7 +163,7 @@
             <form id="rsvp-form" class="rsvp-form">
                 <label class="form-card">
                     <span>Ваше имя и фамилия *</span>
-                    <input type="text" id="guestName" name="guestName" placeholder="Введите имя и фамилию" required>
+                    <input type="text" id="guestName" name="guestName" placeholder="Имя и фамилия" required>
                 </label>
                 <fieldset class="form-card">
                     <legend>Подтвердите своё присутствие *</legend>
@@ -197,6 +217,9 @@
     </div>
 
     <script>
+        var rsvpScriptUrl = 'https://script.google.com/macros/s/AKfycbwdWzRxHzy0KyYv6Kmnz-eijjB6KOmcHMMitBcwAw6eNwcUMQkCAA1wcJ52dpkdD3jidQ/exec';
+        var floristScriptUrl = 'https://script.google.com/macros/s/AKfycbzt_xNRTQK9YGLlLAcjB4Ov_cXusjUmkuH0pCotY6C3hjhWmFVmRClnCtRYbxlGpVOf/exec';
+
         // Персонализация приглашения из URL параметра
         (function () {
             var invitationText = document.querySelector('.invitation-text-top');
@@ -215,11 +238,21 @@
         // Управление конвертом (точно как в референсе)
         (function () {
             var envelopeWrapper = document.querySelector('.envelope-wrapper');
-            if (envelopeWrapper) {
-                envelopeWrapper.addEventListener('click', function () {
-                    envelopeWrapper.classList.toggle('flap');
-                });
+            if (!envelopeWrapper) return;
+
+            function toggleEnvelope() {
+                envelopeWrapper.classList.toggle('flap');
+                envelopeWrapper.setAttribute('aria-pressed', envelopeWrapper.classList.contains('flap'));
             }
+
+            envelopeWrapper.addEventListener('click', toggleEnvelope);
+
+            envelopeWrapper.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    toggleEnvelope();
+                }
+            });
         })();
 
         ymaps.ready(function () {
@@ -283,17 +316,15 @@
                 submitButton.disabled = true;
                 submitButton.textContent = 'Отправка...';
 
-                // URL вашего Google Apps Script
-                var scriptUrl = 'https://script.google.com/macros/s/AKfycbwdWzRxHzy0KyYv6Kmnz-eijjB6KOmcHMMitBcwAw6eNwcUMQkCAA1wcJ52dpkdD3jidQ/exec';
-
                 // Отправляем данные
-                fetch(scriptUrl, {
+                fetch(rsvpScriptUrl, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
+                        formType: 'rsvp',
                         name: guestName,
                         attendance: attendance
                     })
@@ -309,6 +340,137 @@
                     // Заменяем кнопку на сообщение об успехе
                     var actionsDiv = submitButton.parentElement;
                     actionsDiv.innerHTML = '<p style="text-align: center; color: var(--accent); font-weight: 500; margin: 0;">Спасибо! Ваш ответ отправлен.</p>';
+                });
+            });
+        })();
+
+        (function () {
+            var toggleButton = document.getElementById('toggle-florist-form');
+            var wrapper = document.getElementById('florist-form-wrapper');
+            var form = document.getElementById('florist-form');
+            if (!toggleButton || !wrapper || !form) return;
+
+            var nameInput = form.querySelector('input[name="floristName"]');
+            var phoneInput = form.querySelector('input[name="floristPhone"]');
+
+            function getDigits(value) {
+                return value.replace(/\D/g, '');
+            }
+
+            function normalizeDigits(value) {
+                var digits = getDigits(value);
+                if (!digits) return '';
+                if (digits.charAt(0) === '8') {
+                    digits = '7' + digits.slice(1);
+                }
+                if (digits.charAt(0) !== '7') {
+                    digits = '7' + digits;
+                }
+                return digits.slice(0, 11);
+            }
+
+            function formatPhone(digits) {
+                if (!digits) return '';
+                var core = digits.slice(1);
+                var result = '+7';
+                if (core.length) {
+                    result += ' (' + core.slice(0, 3);
+                    if (core.length >= 3) {
+                        result += ')';
+                    }
+                    if (core.length > 3) {
+                        result += ' ' + core.slice(3, 6);
+                    }
+                    if (core.length > 6) {
+                        result += '-' + core.slice(6, 8);
+                    }
+                    if (core.length > 8) {
+                        result += '-' + core.slice(8, 10);
+                    }
+                }
+                return result;
+            }
+
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function () {
+                    var digits = normalizeDigits(phoneInput.value);
+                    phoneInput.value = digits ? formatPhone(digits) : '';
+                    phoneInput.setCustomValidity('');
+                });
+
+                phoneInput.addEventListener('blur', function () {
+                    var digits = normalizeDigits(phoneInput.value);
+                    if (phoneInput.value && digits.length !== 11) {
+                        phoneInput.setCustomValidity('Введите номер полностью в формате +7 (XXX) XXX-XX-XX');
+                    } else {
+                        phoneInput.setCustomValidity('');
+                    }
+                });
+            }
+
+            toggleButton.addEventListener('click', function () {
+                var isVisible = wrapper.classList.toggle('florist-form-wrapper--visible');
+                toggleButton.setAttribute('aria-expanded', isVisible);
+                wrapper.setAttribute('aria-hidden', (!isVisible).toString());
+                if (isVisible && nameInput) {
+                    setTimeout(function () {
+                        nameInput.focus();
+                    }, 150);
+                }
+            });
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                var floristName = form.floristName.value.trim();
+                var floristPhone = form.floristPhone.value.trim();
+                var sanitizedDigits = normalizeDigits(floristPhone);
+
+                if (nameInput) {
+                    nameInput.value = floristName;
+                    if (!floristName) {
+                        nameInput.setCustomValidity('Введите ваше имя');
+                        nameInput.reportValidity();
+                        return;
+                    } else {
+                        nameInput.setCustomValidity('');
+                    }
+                }
+
+                if (sanitizedDigits.length !== 11) {
+                    if (phoneInput) {
+                        phoneInput.setCustomValidity('Введите номер полностью в формате +7 (XXX) XXX-XX-XX');
+                        phoneInput.reportValidity();
+                    }
+                    return;
+                }
+
+                if (phoneInput) {
+                    phoneInput.value = formatPhone(sanitizedDigits);
+                    phoneInput.setCustomValidity('');
+                }
+
+                var submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Отправка...';
+
+                fetch(floristScriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        formType: 'flower-subscription',
+                        name: floristName,
+                        phone: '+' + sanitizedDigits
+                    })
+                }).then(function () {
+                    var actionsDiv = submitButton.parentElement;
+                    actionsDiv.innerHTML = '<p style="text-align: center; color: var(--accent); font-weight: 500; margin: 0;">Спасибо! Флористы скоро свяжутся с вами.</p>';
+                }).catch(function () {
+                    var actionsDiv = submitButton.parentElement;
+                    actionsDiv.innerHTML = '<p style="text-align: center; color: var(--accent); font-weight: 500; margin: 0;">Спасибо! Ваш запрос отправлен.</p>';
                 });
             });
         })();
